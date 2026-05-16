@@ -1,6 +1,7 @@
 import json
 import os
 import pathlib
+import shutil
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
@@ -19,11 +20,16 @@ _BASE = pathlib.Path(__file__).resolve().parent.parent
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    chroma_path = str(_BASE / "chroma_db")
+    src = str(_BASE / "chroma_db")
+    # Vercel Lambda: /var/task is read-only; SQLite needs a writable path
+    if os.getenv("VERCEL"):
+        chroma_path = "/tmp/chroma_db"
+        if not os.path.exists(chroma_path):
+            shutil.copytree(src, chroma_path)
+    else:
+        chroma_path = src
     if not os.path.exists(chroma_path):
-        raise RuntimeError(
-            "ChromaDB index not found. Run: python ingest.py"
-        )
+        raise RuntimeError("ChromaDB index not found. Run: python ingest.py")
     app.state.chain = build_chain(chroma_path)
     yield
 
