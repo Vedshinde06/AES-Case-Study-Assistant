@@ -2,12 +2,15 @@ import json
 import os
 from contextlib import asynccontextmanager
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 
 from app.rag import build_chain
 from app.schemas import ChatRequest, ClearResponse
 from app.session import clear_session
+
+load_dotenv()
 
 
 @asynccontextmanager
