@@ -30,4 +30,9 @@ def test_build_chain_returns_runnable():
         chain = build_chain("./fake_db")
 
     assert chain is not None
+    mock_chroma_cls.assert_called_once_with(
+        persist_directory="./fake_db",
+        embedding_function=mock_emb_cls.return_value,
+        collection_name="aes-case-studies",
+    )
     mock_vectorstore.as_retriever.assert_called_once_with(search_kwargs={"k": 5})

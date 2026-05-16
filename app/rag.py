@@ -36,10 +36,12 @@ def build_chain(persist_directory: str):
         ("human", "{question}"),
     ])
 
+    async def _retrieve(x: dict) -> str:
+        docs = await retriever.ainvoke(x["question"])
+        return format_docs(docs)
+
     rag_chain = (
-        RunnablePassthrough.assign(
-            context=lambda x: format_docs(retriever.invoke(x["question"]))
-        )
+        RunnablePassthrough.assign(context=_retrieve)
         | prompt
         | llm
     )
