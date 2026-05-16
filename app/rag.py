@@ -1,9 +1,12 @@
+import os
+
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 
 from app.session import get_session_history
 
@@ -28,7 +31,13 @@ def build_chain(persist_directory: str):
         collection_name="aes-case-studies",
     )
     retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
-    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", streaming=True)
+
+    endpoint = HuggingFaceEndpoint(
+        repo_id="openai/gpt-oss-120b",
+        huggingfacehub_api_token=os.getenv("HF_TOKEN"),
+        streaming=True,
+    )
+    llm = ChatHuggingFace(llm=endpoint)
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", _SYSTEM_PROMPT),
