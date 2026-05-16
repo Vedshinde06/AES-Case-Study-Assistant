@@ -1,0 +1,11 @@
+langchain-community
+langchain-text-splitters
+langchain-google-genai
+langchain-chroma
+pypdf
+python-dotenv
+fastapi
+uvicorn[standard]
+sse-starlette
+pytest
+httpx
