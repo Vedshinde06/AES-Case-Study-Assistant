@@ -24,9 +24,11 @@ def test_build_chain_returns_runnable():
 
     with patch("app.rag.GoogleGenerativeAIEmbeddings") as mock_emb_cls, \
          patch("app.rag.Chroma") as mock_chroma_cls, \
-         patch("app.rag.ChatGoogleGenerativeAI"):
+         patch("app.rag.HuggingFaceEndpoint") as mock_endpoint_cls, \
+         patch("app.rag.ChatHuggingFace") as mock_chat_cls:
 
         mock_chroma_cls.return_value = mock_vectorstore
+        mock_chat_cls.return_value = MagicMock()
         chain = build_chain("./fake_db")
 
     assert chain is not None
@@ -36,3 +38,9 @@ def test_build_chain_returns_runnable():
         collection_name="aes-case-studies",
     )
     mock_vectorstore.as_retriever.assert_called_once_with(search_kwargs={"k": 5})
+    mock_endpoint_cls.assert_called_once_with(
+        repo_id="openai/gpt-oss-120b",
+        huggingfacehub_api_token="test-hf-token-for-testing",
+        streaming=True,
+    )
+    mock_chat_cls.assert_called_once_with(llm=mock_endpoint_cls.return_value)

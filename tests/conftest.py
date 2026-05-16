@@ -3,6 +3,7 @@ import pytest
 import app.session as session_module
 
 os.environ.setdefault("GOOGLE_API_KEY", "test-key-for-testing")
+os.environ.setdefault("HF_TOKEN", "test-hf-token-for-testing")
 
 
 @pytest.fixture(autouse=True)
