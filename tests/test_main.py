@@ -1,4 +1,3 @@
-import json
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -72,6 +71,7 @@ def test_chat_streams_error_on_exception(client):
         lines = [line for line in resp.iter_lines() if line]
 
     assert any('"error"' in line for line in lines)
+    assert "data: [DONE]" in lines
 
 
 def test_chat_empty_question_returns_422(client):

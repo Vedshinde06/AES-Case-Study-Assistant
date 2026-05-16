@@ -34,11 +34,15 @@ async def chat(request: ChatRequest):
             ):
                 if chunk.content:
                     yield f"data: {json.dumps({'token': chunk.content})}\n\n"
-            yield "data: [DONE]\n\n"
         except Exception as e:
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
+        yield "data: [DONE]\n\n"
 
-    return StreamingResponse(token_stream(), media_type="text/event-stream")
+    return StreamingResponse(
+        token_stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @app.delete("/api/chat/{session_id}")
