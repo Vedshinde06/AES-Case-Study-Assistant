@@ -1,10 +1,12 @@
 import json
 import os
+import pathlib
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.rag import build_chain
 from app.schemas import ChatRequest, ClearResponse
@@ -12,10 +14,12 @@ from app.session import clear_session
 
 load_dotenv()
 
+_BASE = pathlib.Path(__file__).resolve().parent.parent
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    chroma_path = "./chroma_db"
+    chroma_path = str(_BASE / "chroma_db")
     if not os.path.exists(chroma_path):
         raise RuntimeError(
             "ChromaDB index not found. Run: python ingest.py"
@@ -57,3 +61,6 @@ async def clear_chat(session_id: str):
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+app.mount("/", StaticFiles(directory=str(_BASE / "frontend"), html=True), name="static")

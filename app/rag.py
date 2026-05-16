@@ -15,6 +15,8 @@ _SYSTEM_PROMPT = (
     "a company specialising in engineering design, simulation, and analysis. "
     "Answer questions based strictly on the following case studies and documents. "
     "If the answer is not found in the context, say you don't have that information.\n\n"
+    "Format your answers as clear, readable prose or bullet points. "
+    "Do not use tables, charts, or grids — plain text and lists only.\n\n"
     "Context:\n{context}"
 )
 
@@ -36,6 +38,7 @@ def build_chain(persist_directory: str):
         repo_id="openai/gpt-oss-120b",
         huggingfacehub_api_token=os.getenv("HF_TOKEN"),
         streaming=True,
+        max_new_tokens=2048,
     )
     llm = ChatHuggingFace(llm=endpoint)
 
